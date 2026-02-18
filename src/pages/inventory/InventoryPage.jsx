@@ -118,7 +118,7 @@ export function InventoryPage() {
     }
   }
 
-  async function printDepartment(dept) {
+  async function print(dept) {
     try {
       const data = await inventoryApi.fetchInventoryItems({ department: dept })
       const rows = data || []
@@ -462,5 +462,5 @@ export function InventoryPage() {
         </div>
       )}
     </div>
-  )
+  ))
 }
