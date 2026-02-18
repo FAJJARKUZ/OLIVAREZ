@@ -72,8 +72,8 @@ export function AssetDeploymentPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-neutral-800">Asset Deployment</h1>
-      <p className="text-neutral-500">
+      <h1 className="text-2xl font-bold text-school-700">Asset Deployment</h1>
+      <p className="text-gray-600">
         {canUpload ? 'Upload deployment letters. Admin can view only.' : 'Manage deployed assets and serial numbers.'}
       </p>
 
@@ -110,14 +110,14 @@ export function AssetDeploymentPage() {
       <Card>
         <CardTitle>Deployments</CardTitle>
         {loading ? (
-          <p className="text-neutral-500">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         ) : deployments.length === 0 ? (
-          <p className="text-neutral-500">No deployments yet.</p>
+          <p className="text-gray-600">No deployments yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600">
+                <tr className="border-b border-gray-200 text-left text-gray-600">
                   <th className="pb-3 pr-4">Serial #</th>
                   <th className="pb-3 pr-4">Asset</th>
                   <th className="pb-3 pr-4">Department</th>
@@ -127,13 +127,13 @@ export function AssetDeploymentPage() {
               </thead>
               <tbody>
                 {deployments.map((d) => (
-                  <tr key={d.id} className="border-b border-neutral-100">
-                    <td className="py-3 pr-4 font-mono">{d.serial_number ?? '—'}</td>
+                  <tr key={d.id} className="border-b border-gray-100">
+                    <td className="py-3 pr-4">{d.serial_number ?? '—'}</td>
                     <td className="py-3 pr-4">{d.asset_name ?? '—'}</td>
                     <td className="py-3 pr-4">{d.department ?? '—'}</td>
                     <td className="py-3 pr-4">
                       {d.letter_url ? (
-                        <a href={d.letter_url} target="_blank" rel="noopener noreferrer" className="text-olive-600 hover:underline">
+                        <a href={d.letter_url} target="_blank" rel="noopener noreferrer" className="text-school-600 hover:underline">
                           View
                         </a>
                       ) : canUpload ? (

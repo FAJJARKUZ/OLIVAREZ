@@ -27,8 +27,8 @@ export function FinancingPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-neutral-800">Financing</h1>
-      <p className="text-neutral-500">Inventory-related financial summaries.</p>
+      <h1 className="text-2xl font-bold text-school-700">Financing</h1>
+      <p className="text-gray-600">Inventory-related financial summaries.</p>
 
       {error && (
         <div className="rounded-xl bg-red-50 text-red-600 p-4 text-sm">{error}</div>
@@ -38,19 +38,19 @@ export function FinancingPage() {
         <Card>
           <CardTitle>Inventory summary</CardTitle>
           {loading ? (
-            <p className="text-neutral-500">Loading...</p>
+            <p className="text-gray-600">Loading...</p>
           ) : summary ? (
-            <ul className="text-sm text-neutral-600 space-y-2">
+            <ul className="text-sm text-gray-600 space-y-2">
               <li>Total item types: {summary.totalItems}</li>
               <li>Total quantity (units): {summary.totalQty}</li>
             </ul>
           ) : (
-            <p className="text-neutral-500">No data.</p>
+            <p className="text-gray-600">No data.</p>
           )}
         </Card>
         <Card>
           <CardTitle>Notes</CardTitle>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-gray-600">
             Financial details can be extended with cost per item, department budgets, and purchase orders linked to Supabase.
           </p>
         </Card>

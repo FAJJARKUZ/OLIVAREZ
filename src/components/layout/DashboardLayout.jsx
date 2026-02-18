@@ -1,12 +1,12 @@
 import { Outlet } from 'react-router-dom'
-import { Sidebar } from './Sidebar'
+import { TopNav } from './TopNav'
 
 export function DashboardLayout() {
   return (
-    <div className="flex min-h-screen bg-neutral-50">
-      <Sidebar />
-      <main className="flex-1 overflow-auto p-6 lg:p-8">
-        <div className="max-w-6xl mx-auto animate-fade-in">
+    <div className="flex flex-col min-h-screen bg-white">
+      <TopNav />
+      <main className="flex-1 overflow-auto bg-gray-50">
+        <div className="max-w-7xl mx-auto animate-fade-in">
           <Outlet />
         </div>
       </main>

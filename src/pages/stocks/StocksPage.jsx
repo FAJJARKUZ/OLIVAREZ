@@ -36,8 +36,8 @@ export function StocksPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-neutral-800">Stocks</h1>
-      <p className="text-neutral-500">
+      <h1 className="text-2xl font-bold text-school-700">Stocks</h1>
+      <p className="text-gray-600">
         {isSupplier ? 'View supply requests and update availability.' : 'Monitor stock levels and IT consumable restock list.'}
       </p>
 
@@ -49,14 +49,14 @@ export function StocksPage() {
         <Card>
           <CardTitle>IT consumable restock list (low stock ≤5)</CardTitle>
           {loading ? (
-            <p className="text-neutral-500">Loading...</p>
+            <p className="text-gray-600">Loading...</p>
           ) : restockList.length === 0 ? (
-            <p className="text-neutral-500">No low-stock items.</p>
+            <p className="text-gray-600">No low-stock items.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-left text-neutral-600">
+                  <tr className="border-b border-gray-200 text-left text-gray-600">
                     <th className="pb-3 pr-4">Name</th>
                     <th className="pb-3 pr-4">Department</th>
                     <th className="pb-3 pr-4">Quantity</th>
@@ -64,7 +64,7 @@ export function StocksPage() {
                 </thead>
                 <tbody>
                   {restockList.map((r) => (
-                    <tr key={r.id} className="border-b border-neutral-100">
+                    <tr key={r.id} className="border-b border-gray-100">
                       <td className="py-3 pr-4">{r.name}</td>
                       <td className="py-3 pr-4">{r.department ?? '—'}</td>
                       <td className="py-3 pr-4">{r.quantity}</td>
@@ -80,14 +80,14 @@ export function StocksPage() {
       <Card>
         <CardTitle>Supply requests</CardTitle>
         {loading ? (
-          <p className="text-neutral-500">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         ) : requests.length === 0 ? (
-          <p className="text-neutral-500">No supply requests.</p>
+          <p className="text-gray-600">No supply requests.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600">
+                <tr className="border-b border-gray-200 text-left text-gray-600">
                   <th className="pb-3 pr-4">Item</th>
                   <th className="pb-3 pr-4">Quantity</th>
                   <th className="pb-3 pr-4">Status</th>
@@ -95,7 +95,7 @@ export function StocksPage() {
               </thead>
               <tbody>
                 {requests.map((r) => (
-                  <tr key={r.id} className="border-b border-neutral-100">
+                  <tr key={r.id} className="border-b border-gray-100">
                     <td className="py-3 pr-4">{r.item_name ?? r.id}</td>
                     <td className="py-3 pr-4">{r.quantity ?? '—'}</td>
                     <td className="py-3 pr-4">{r.availability ?? '—'}</td>

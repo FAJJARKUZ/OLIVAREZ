@@ -42,17 +42,17 @@ export function PrintLetter({ title, children, className = '' }) {
       </div>
       <div
         ref={printRef}
-        className="rounded-2xl border border-neutral-200 bg-white p-8 text-neutral-800"
+        className="rounded-2xl border border-gray-200 bg-white p-8 text-gray-800"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
-        <div className="letterhead border-b-2 border-olive-600 pb-4 mb-8">
-          <h1 className="text-xl font-bold text-olive-800">Olivarez College</h1>
-          <p className="text-sm text-olive-600 mt-1">Inventory Management</p>
+        <div className="letterhead border-b-2 border-school-600 pb-4 mb-8">
+          <h1 className="text-xl font-bold text-school-700">Olivarez College</h1>
+          <p className="text-sm text-school-600 mt-1">Inventory Management</p>
         </div>
         <div className="content">
           {children}
         </div>
-        <div className="mt-12 text-sm text-neutral-500">
+        <div className="mt-12 text-sm text-gray-600">
           — Olivarez College Inventory Management System
         </div>
       </div>

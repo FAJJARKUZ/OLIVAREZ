@@ -60,53 +60,56 @@ const icons = {
   ),
 }
 
-export function Sidebar() {
+export function TopNav() {
   const { role, user, signOut } = useAuth()
   const items = getSidebarItemsForRole(role)
 
   return (
-    <aside
-      className="w-64 min-h-screen bg-white border-r border-gray-200 flex flex-col shrink-0"
-      aria-label="Sidebar navigation"
+    <nav
+      className="w-full bg-white border-b border-gray-200 shadow-sm"
+      aria-label="Top navigation"
     >
-      <div className="p-6 border-b border-gray-200">
-        <h1 className="text-lg font-bold text-school-700">Olivarez College</h1>
-        <p className="text-xs text-gray-500 mt-0.5">Inventory Management</p>
+      {/* Top bar with logo and user info */}
+      <div className="px-6 py-3 flex items-center justify-between border-b border-gray-200">
+        <div className="flex-1">
+          <h1 className="text-lg font-bold text-gray-800">Olivarez College</h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <p className="text-xs text-gray-600">{user?.email}</p>
+          <button
+            onClick={() => signOut()}
+            className="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors"
+          >
+            Logout
+          </button>
+        </div>
       </div>
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+
+      {/* Navigation tabs */}
+      <div className="px-6 py-0 flex items-center overflow-x-auto">
         {items.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded px-4 py-3 text-sm transition-all duration-200 ${
+              `flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
                 isActive
-                  ? 'bg-school-100 text-school-700 border-l-2 border-school-500 font-medium'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-school-600'
+                  ? 'border-gray-800 text-gray-800'
+                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <span className={`text-lg ${isActive ? 'text-school-600' : 'text-gray-400'}`}>{icons[item.icon] ?? icons.reports}</span>
+                <span className={`${isActive ? 'text-gray-800' : 'text-gray-400'}`}>
+                  {icons[item.icon] ?? icons.reports}
+                </span>
                 {item.label}
               </>
             )}
           </NavLink>
         ))}
-      </nav>
-      <div className="p-4 border-t border-gray-200">
-        <p className="text-xs text-gray-500 truncate px-2" title={user?.email}>
-          {user?.email}
-        </p>
-        <button
-          type="button"
-          onClick={() => signOut()}
-          className="mt-2 w-full text-left rounded px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-red-600 transition-colors"
-        >
-          Logout
-        </button>
       </div>
-    </aside>
+    </nav>
   )
 }

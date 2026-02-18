@@ -78,7 +78,7 @@ export function ClearancesPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-neutral-800">Clearances</h1>
+        <h1 className="text-2xl font-bold text-school-700">Clearances</h1>
         {!canApprove && (
           <Button onClick={() => setShowForm(true)}>Submit clearance request</Button>
         )}
@@ -102,14 +102,14 @@ export function ClearancesPage() {
       <Card>
         <CardTitle>Requests</CardTitle>
         {loading ? (
-          <p className="text-neutral-500">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         ) : clearances.length === 0 ? (
-          <p className="text-neutral-500">No clearance requests.</p>
+          <p className="text-gray-600">No clearance requests.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600">
+                <tr className="border-b border-gray-200 text-left text-gray-600">
                   <th className="pb-3 pr-4">Type</th>
                   <th className="pb-3 pr-4">Description</th>
                   <th className="pb-3 pr-4">Status</th>
@@ -119,7 +119,7 @@ export function ClearancesPage() {
               </thead>
               <tbody>
                 {clearances.map((c) => (
-                  <tr key={c.id} className="border-b border-neutral-100">
+                  <tr key={c.id} className="border-b border-gray-100">
                     <td className="py-3 pr-4">{c.request_type ?? '—'}</td>
                     <td className="py-3 pr-4">{c.description ?? '—'}</td>
                     <td className="py-3 pr-4">
@@ -186,7 +186,7 @@ export function ClearancesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
           <div className="rounded-2xl bg-white shadow-xl max-w-md w-full p-6 animate-fade-in">
             <h2 className="text-lg font-semibold mb-4">Approve or reject</h2>
-            <p className="text-sm text-neutral-600 mb-4">{reviewModal.description}</p>
+            <p className="text-sm text-gray-600 mb-4">{reviewModal.description}</p>
             <Select
               label="Decision"
               value={reviewStatus}

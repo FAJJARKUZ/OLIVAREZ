@@ -49,8 +49,8 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-neutral-800">Reports</h1>
-      <p className="text-neutral-500">View and export inventory, clearance, and deployment reports.</p>
+      <h1 className="text-2xl font-bold text-school-700">Reports</h1>
+      <p className="text-gray-600">View and export inventory, clearance, and deployment reports.</p>
 
       <Card>
         <CardTitle>Select report</CardTitle>
@@ -76,14 +76,14 @@ export function ReportsPage() {
       <Card>
         <CardTitle>{reportType} report</CardTitle>
         {loading ? (
-          <p className="text-neutral-500">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         ) : data.length === 0 ? (
-          <p className="text-neutral-500">No data.</p>
+          <p className="text-gray-600">No data.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600">
+                <tr className="border-b border-gray-200 text-left text-gray-600">
                   {Object.keys(data[0]).map((k) => (
                     <th key={k} className="pb-3 pr-4 capitalize">{k}</th>
                   ))}
@@ -91,7 +91,7 @@ export function ReportsPage() {
               </thead>
               <tbody>
                 {data.slice(0, 50).map((row, i) => (
-                  <tr key={i} className="border-b border-neutral-100">
+                  <tr key={i} className="border-b border-gray-100">
                     {Object.values(row).map((v, j) => (
                       <td key={j} className="py-3 pr-4">
                         {v != null ? String(v) : '—'}
@@ -104,7 +104,7 @@ export function ReportsPage() {
           </div>
         )}
         {data.length > 50 && (
-          <p className="mt-2 text-sm text-neutral-500">Showing first 50 rows. Export CSV for full data.</p>
+          <p className="mt-2 text-sm text-gray-600">Showing first 50 rows. Export CSV for full data.</p>
         )}
       </Card>
     </div>

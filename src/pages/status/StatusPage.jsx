@@ -31,8 +31,8 @@ export function StatusPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-neutral-800">Status</h1>
-      <p className="text-neutral-500">Track approval and clearance statuses.</p>
+      <h1 className="text-2xl font-bold text-school-700">Status</h1>
+      <p className="text-gray-600">Track approval and clearance statuses.</p>
 
       <Card>
         <Select
@@ -51,14 +51,14 @@ export function StatusPage() {
       <Card>
         <CardTitle>Clearance status</CardTitle>
         {loading ? (
-          <p className="text-neutral-500">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         ) : clearances.length === 0 ? (
-          <p className="text-neutral-500">No records.</p>
+          <p className="text-gray-600">No records.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600">
+                <tr className="border-b border-gray-200 text-left text-gray-600">
                   <th className="pb-3 pr-4">Type</th>
                   <th className="pb-3 pr-4">Description</th>
                   <th className="pb-3 pr-4">Status</th>
@@ -67,7 +67,7 @@ export function StatusPage() {
               </thead>
               <tbody>
                 {clearances.map((c) => (
-                  <tr key={c.id} className="border-b border-neutral-100">
+                  <tr key={c.id} className="border-b border-gray-100">
                     <td className="py-3 pr-4">{c.request_type ?? '—'}</td>
                     <td className="py-3 pr-4">{c.description ?? '—'}</td>
                     <td className="py-3 pr-4">

@@ -1,8 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Card, CardTitle } from '../../components/ui/Card'
-import { Button } from '../../components/ui/Button'
-import { Select } from '../../components/ui/Select'
-import { Input } from '../../components/ui/Input'
 import * as clearancesApi from '../../lib/api/clearances'
 
 export function ApprovalPage() {
@@ -44,75 +40,125 @@ export function ApprovalPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-neutral-800">Approval</h1>
-      <p className="text-neutral-500">Approve or reject clearance requests.</p>
+    <div className="min-h-screen bg-gray-50 text-gray-900 p-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-school-600 mb-2">Approval Queue</h1>
+        <p className="text-gray-600 mb-6">
+          <span className="font-medium">Pending:</span> <span className="text-school-600 font-semibold">{clearances.length}</span> requests
+        </p>
 
-      {error && (
-        <div className="rounded-xl bg-red-50 text-red-600 p-4 text-sm">{error}</div>
-      )}
-
-      <Card>
-        <CardTitle>Pending clearances</CardTitle>
-        {loading ? (
-          <p className="text-neutral-500">Loading...</p>
-        ) : clearances.length === 0 ? (
-          <p className="text-neutral-500">No pending requests.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600">
-                  <th className="pb-3 pr-4">Type</th>
-                  <th className="pb-3 pr-4">Description</th>
-                  <th className="pb-3 pr-4">Date</th>
-                  <th className="pb-3 pl-4">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clearances.map((c) => (
-                  <tr key={c.id} className="border-b border-neutral-100">
-                    <td className="py-3 pr-4">{c.request_type ?? '—'}</td>
-                    <td className="py-3 pr-4">{c.description ?? '—'}</td>
-                    <td className="py-3 pr-4">
-                      {c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}
-                    </td>
-                    <td className="py-3 pl-4">
-                      <Button variant="ghost" onClick={() => setReviewModal(c)}>
-                        Review
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-300 text-red-800 p-3 rounded text-sm">
+            <span className="text-red-600 font-semibold">Error:</span> {error}
           </div>
         )}
-      </Card>
+
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900">Pending Clearances</h2>
+          </div>
+          
+          {loading ? (
+            <div className="p-4 text-gray-500 text-sm">
+              <span className="inline-block animate-spin">⟳</span> Loading...
+            </div>
+          ) : clearances.length === 0 ? (
+            <div className="p-4 text-gray-500 text-sm">
+              No pending requests
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-gray-100 border-b border-gray-200">
+                    <th className="px-3 py-2 text-left text-gray-900 font-semibold">Type</th>
+                    <th className="px-3 py-2 text-left text-gray-900 font-semibold">Description</th>
+                    <th className="px-3 py-2 text-left text-gray-900 font-semibold">Date</th>
+                    <th className="px-3 py-2 text-left text-gray-900 font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clearances.map((c) => (
+                    <tr key={c.id} className="border-b border-gray-200 hover:bg-gray-50">
+                      <td className="px-3 py-2 text-gray-700 font-medium">{c.request_type ?? '—'}</td>
+                      <td className="px-3 py-2 text-gray-700">{c.description ?? '—'}</td>
+                      <td className="px-3 py-2 text-gray-600">
+                        {c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}
+                      </td>
+                      <td className="px-3 py-2">
+                        <button
+                          onClick={() => setReviewModal(c)}
+                          className="text-school-600 hover:text-school-700 text-xs transition-colors font-medium"
+                        >
+                          Review
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          
+
+        </div>
+      </div>
 
       {reviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="rounded-2xl bg-white shadow-xl max-w-md w-full p-6 animate-fade-in">
-            <h2 className="text-lg font-semibold mb-4">Approve or reject</h2>
-            <p className="text-sm text-neutral-600 mb-4">{reviewModal.description}</p>
-            <Select
-              label="Decision"
-              value={reviewStatus}
-              onChange={(e) => setReviewStatus(e.target.value)}
-              options={[
-                { value: 'approved', label: 'Approved' },
-                { value: 'rejected', label: 'Rejected' },
-              ]}
-            />
-            <Input
-              label="Notes"
-              value={reviewNotes}
-              onChange={(e) => setReviewNotes(e.target.value)}
-              className="mt-4"
-            />
-            <div className="mt-6 flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => setReviewModal(null)}>Cancel</Button>
-              <Button onClick={handleReview}>Submit</Button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-2xl max-w-md w-full p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Review Request</h2>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-xs text-gray-700 font-medium mb-2">
+                  Description
+                </label>
+                <p className="text-xs text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                  {reviewModal.description}
+                </p>
+              </div>
+              
+              <div>
+                <label className="block text-xs text-gray-700 font-medium mb-2">
+                  Decision
+                </label>
+                <select
+                  value={reviewStatus}
+                  onChange={(e) => setReviewStatus(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded focus:outline-none focus:border-school-500 focus:ring-1 focus:ring-school-500"
+                >
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-700 font-medium mb-2">
+                  Notes
+                </label>
+                <textarea
+                  value={reviewNotes}
+                  onChange={(e) => setReviewNotes(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded focus:outline-none focus:border-school-500 focus:ring-1 focus:ring-school-500"
+                  rows="3"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end pt-4">
+              <button
+                onClick={() => setReviewModal(null)}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded text-sm transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReview}
+                className="px-4 py-2 bg-school-600 hover:bg-school-700 text-white rounded text-sm transition-all"
+              >
+                Submit
+              </button>
             </div>
           </div>
         </div>

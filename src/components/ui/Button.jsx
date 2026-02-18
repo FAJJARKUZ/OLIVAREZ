@@ -1,11 +1,11 @@
 const variants = {
   primary:
-    'bg-olive-600 text-white hover:bg-olive-700 focus:ring-olive-500',
+    'bg-school-600 text-white hover:bg-school-700 focus:ring-school-500',
   secondary:
-    'bg-neutral-100 text-neutral-800 hover:bg-neutral-200 focus:ring-neutral-400',
+    'bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-gray-400',
   outline:
-    'border-2 border-olive-500 text-olive-600 hover:bg-olive-50 focus:ring-olive-500',
-  ghost: 'text-neutral-600 hover:bg-neutral-100 focus:ring-neutral-400',
+    'border-2 border-school-500 text-school-600 hover:bg-school-50 focus:ring-school-500',
+  ghost: 'text-gray-600 hover:bg-gray-100 focus:ring-gray-400',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
 }
 

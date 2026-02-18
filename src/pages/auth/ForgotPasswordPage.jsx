@@ -29,12 +29,12 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-md animate-fade-in">
-        <div className="rounded-2xl bg-white shadow-sm border border-neutral-100 p-8">
+        <div className="rounded-2xl bg-white shadow-sm border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-olive-800">Forgot password</h1>
-            <p className="text-neutral-500 mt-1">Enter your email to receive a reset link</p>
+            <h1 className="text-2xl font-bold text-school-700">Forgot password</h1>
+            <p className="text-gray-600 mt-1">Enter your email to receive a reset link</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
@@ -52,7 +52,7 @@ export function ForgotPasswordPage() {
               </p>
             )}
             {message && (
-              <p className="text-sm text-olive-600 bg-olive-50 rounded-xl p-3" role="status">
+              <p className="text-sm text-school-600 bg-school-50 rounded-xl p-3" role="status">
                 {message}
               </p>
             )}
@@ -60,8 +60,8 @@ export function ForgotPasswordPage() {
               {loading ? 'Sending...' : 'Send reset link'}
             </Button>
           </form>
-          <p className="mt-6 text-center text-sm text-neutral-500">
-            <Link to="/login" className="text-olive-600 hover:text-olive-700 font-medium">
+          <p className="mt-6 text-center text-sm text-gray-600">
+            <Link to="/login" className="text-school-600 hover:text-school-700 font-medium">
               Back to sign in
             </Link>
           </p>

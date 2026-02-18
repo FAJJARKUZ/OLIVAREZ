@@ -6,8 +6,6 @@ export async function fetchInventoryItems(filters = {}) {
     .select('*')
     .order('created_at', { ascending: false })
   if (filters.department) q = q.eq('department', filters.department)
-  if (filters.classification) q = q.eq('classification', filters.classification)
-  if (filters.defective_only) q = q.eq('is_defective', true)
   const { data, error } = await q
   if (error) throw error
   return data ?? []

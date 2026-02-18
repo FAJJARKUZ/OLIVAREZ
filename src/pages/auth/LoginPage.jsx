@@ -31,12 +31,12 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-md animate-fade-in">
-        <div className="rounded-2xl bg-white shadow-sm border border-neutral-100 p-8">
+        <div className="rounded-2xl bg-white shadow-sm border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-olive-800">Olivarez College</h1>
-            <p className="text-neutral-500 mt-1">Inventory Management</p>
+            <h1 className="text-2xl font-bold text-school-700">Olivarez College</h1>
+            <p className="text-gray-600 mt-1">Inventory Management System</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
@@ -67,10 +67,10 @@ export function LoginPage() {
             </Button>
           </form>
           <div className="mt-6 flex flex-col sm:flex-row justify-between gap-2 text-sm">
-            <Link to="/forgot-password" className="text-olive-600 hover:text-olive-700">
+            <Link to="/forgot-password" className="text-school-600 hover:text-school-700">
               Forgot password?
             </Link>
-            <Link to="/register" className="text-olive-600 hover:text-olive-700">
+            <Link to="/register" className="text-school-600 hover:text-school-700">
               Create account
             </Link>
           </div>

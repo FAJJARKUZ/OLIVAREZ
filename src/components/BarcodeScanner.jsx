@@ -51,10 +51,10 @@ export function BarcodeScanner({ onScan, onClose }) {
   return (
     <div className="rounded-2xl bg-white p-6 shadow-lg">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-neutral-800">Scan barcode / QR</h3>
+        <h3 className="font-semibold text-gray-800">Scan barcode / QR</h3>
         <Button variant="ghost" onClick={handleClose}>Close</Button>
       </div>
-      <div id="barcode-reader" ref={ref} className="rounded-xl overflow-hidden bg-neutral-100 min-h-[240px]" />
+      <div id="barcode-reader" ref={ref} className="rounded-xl overflow-hidden bg-gray-100 min-h-[240px]" />
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       <div className="mt-4 flex gap-2">
         {!scanning ? (

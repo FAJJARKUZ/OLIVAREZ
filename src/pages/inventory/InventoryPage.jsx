@@ -1,87 +1,193 @@
-import { useState, useEffect } from 'react'
-import { Card, CardTitle } from '../../components/ui/Card'
-import { Button } from '../../components/ui/Button'
-import { Input } from '../../components/ui/Input'
-import { Select } from '../../components/ui/Select'
+import { useState, useEffect, useCallback } from 'react'
 import * as inventoryApi from '../../lib/api/inventory'
 
-const CLASSIFICATIONS = ['transfer', 'reassignment', 'disposal']
-const DEPARTMENTS = ['IT', 'Admin', 'Accounting', 'HR', 'Library', 'Other']
+const DEPARTMENTS = [
+  'FINANCE DEPARTMENT',
+  'ACCOUNTING DEPARTMENT',
+  'REGISTRAR DEPARTMENT',
+  'HR DEPARTMENT',
+  'CLINIC DEPARTMENT',
+  'VFAS DEPARTMENT',
+  'ORC / SPORTSCENTER DEPARTMENT',
+  'MARKETING / LINKAGES DEPARTMENT',
+  'OLIVARIAN ECHO OFFICE',
+  'QUALITY ASSURANCE DEPARTMENT',
+  'SECURITY DEPARTMENT',
+  'NURSING DEPARTMENT',
+  'PT / RT DEPARTMENT',
+  'MASSCOM / PSYCHOLOGY DEPARTMENT',
+  'CRIMINOLOGY AND DPA DEPARTMENT',
+  'TESDA DEPARTMENT',
+  'THRM DEPARTMENT',
+  'EDUC DEPARTMENT',
+  'OSA / SSG DEPARTMENT',
+  'GRADUATE SCHOOL DEPARTMENT',
+  'BUSINESS / ACCOUNTANCY / CUSTOM DEPARTMENT',
+  'LABORATORY CUSTODIAN',
+  'RESEARCH',
+  'GUIDANCE DEPARTMENT',
+  'CARE GIVING',
+  'PE DEPARTMENT',
+  'CORNER STORE',
+  'AURELIOS PRINTING PRESS DEPARTMENT',
+  'PEAC OFFICE',
+  'CANTEEN',
+  'IMS',
+  'EXECUTIVE DEAN OFFICE',
+  'PROPERTY CUSTODIAN / MOTOR POOL',
+  'BOOKSTORE / SUPPLIES',
+]
+
+const ASSET_COLUMNS = [
+  'ASSET_USER',
+  'MOUSE',
+  'KEYBOARD',
+  'MAC ADDRESS',
+  'PROCESSOR',
+  'MOTHERBOARD',
+  'RAM',
+  'HARD DRIVE',
+  'GRAPHIC CARD',
+  'OPERATING SYSTEM',
+  'OS LICENSES',
+  'COLOR OF CASE',
+  'POWER SUPPLY',
+  'LOCATION',
+  'DOP',
+  'REMARKS',
+]
 
 export function InventoryPage() {
+  const [activeDept, setActiveDept] = useState(DEPARTMENTS[0])
   const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [modal, setModal] = useState(null) // 'add' | { id } | null
-  const [form, setForm] = useState({
-    name: '',
-    description: '',
-    quantity: 0,
-    department: '',
-    classification: '',
-    is_defective: false,
-  })
-  const [filterDept, setFilterDept] = useState('')
-  const [filterClass, setFilterClass] = useState('')
-  const [filterDefective, setFilterDefective] = useState(false)
+  const [form, setForm] = useState({})
+  const [departments, setDepartments] = useState(DEPARTMENTS)
+  const [deptAction, setDeptAction] = useState(null) // department name or null
+  const [deptItems, setDeptItems] = useState([])
+  const [deptSelectedAssetId, setDeptSelectedAssetId] = useState(null)
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
-      const data = await inventoryApi.fetchInventoryItems({
-        department: filterDept || undefined,
-        classification: filterClass || undefined,
-        defective_only: filterDefective || undefined,
-      })
-      setItems(data)
+      const data = await inventoryApi.fetchInventoryItems({ department: activeDept })
+      setItems(data || [])
     } catch (e) {
       setError(e.message)
       setItems([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [activeDept])
 
   useEffect(() => {
     load()
-  }, [filterDept, filterClass, filterDefective])
+  }, [load])
 
   function openAdd() {
-    setModal('add')
-    setForm({
-      name: '',
-      description: '',
-      quantity: 0,
-      department: '',
-      classification: '',
-      is_defective: false,
+    const newForm = {}
+    ASSET_COLUMNS.forEach((col) => {
+      newForm[col.toLowerCase().replace(/ /g, '_')] = ''
     })
+    setForm(newForm)
+    setModal('add')
   }
 
   function openEdit(item) {
     setModal({ id: item.id })
-    setForm({
-      name: item.name ?? '',
-      description: item.description ?? '',
-      quantity: item.quantity ?? 0,
-      department: item.department ?? '',
-      classification: item.classification ?? '',
-      is_defective: item.is_defective ?? false,
+    const editForm = {}
+    ASSET_COLUMNS.forEach((col) => {
+      const key = col.toLowerCase().replace(/ /g, '_')
+      editForm[key] = item[key] ?? ''
     })
+    setForm(editForm)
+  }
+
+  async function openDeptAction(dept) {
+    setDeptAction(dept)
+    try {
+      const data = await inventoryApi.fetchInventoryItems({ department: dept })
+      setDeptItems(data || [])
+      setDeptSelectedAssetId(null)
+    } catch (e) {
+      setDeptItems([])
+      alert('Unable to load department assets: ' + e.message)
+    }
+  }
+
+  async function printDepartment(dept) {
+    try {
+      const data = await inventoryApi.fetchInventoryItems({ department: dept })
+      const rows = data || []
+      const printContent = `
+      <html>
+        <head>
+          <title>${dept} - Asset Inventory</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; color: #111827; }
+            h1 { text-align: center; color: #10b981; font-weight: bold; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th { background-color: #f3f4f6; color: #065f46; padding: 8px; text-align: left; border: 1px solid #e5e7eb; }
+            td { padding: 8px; border: 1px solid #e5e7eb; color: #374151; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <h1>${dept}</h1>
+          <table>
+            <thead>
+              <tr>
+                ${ASSET_COLUMNS.map((col) => `<th>${col}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows
+                .map(
+                  (item) =>
+                    `<tr>${ASSET_COLUMNS.map((col) => {
+                      const key = col.toLowerCase().replace(/ /g, '_')
+                      return `<td>${item[key] ?? '—'}</td>`
+                    }).join('')}</tr>`
+                )
+                .join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+      `
+      const w = window.open('', '_blank')
+      w.document.write(printContent)
+      w.document.close()
+      w.print()
+    } catch (e) {
+      alert('Unable to print department: ' + e.message)
+    }
+  }
+
+  function handleRemoveDepartment(dept) {
+    if (!confirm(`Remove department "${dept}" from the selector? This only hides it locally.`)) return
+    setDepartments((prev) => prev.filter((d) => d !== dept))
+    if (dept === activeDept) {
+      const next = DEPARTMENTS.find((d) => d !== dept) || ''
+      setActiveDept(next)
+      // load will run via effect when activeDept changes
+    }
+    setDeptAction(null)
   }
 
   async function handleSave() {
     setError('')
     try {
       const payload = {
-        name: form.name,
-        description: form.description,
-        quantity: Number(form.quantity) || 0,
-        department: form.department || null,
-        classification: form.classification || null,
-        is_defective: !!form.is_defective,
+        department: activeDept,
       }
+      ASSET_COLUMNS.forEach((col) => {
+        const key = col.toLowerCase().replace(/ /g, '_')
+        payload[key] = form[key] ?? ''
+      })
+
       if (modal === 'add') {
         await inventoryApi.createInventoryItem(payload)
       } else if (modal?.id) {
@@ -95,7 +201,7 @@ export function InventoryPage() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Delete this item?')) return
+    if (!confirm('Delete this asset?')) return
     setError('')
     try {
       await inventoryApi.deleteInventoryItem(id)
@@ -106,148 +212,251 @@ export function InventoryPage() {
     }
   }
 
+  // `printDepartment` is used for printing; remove unused `handlePrint`.
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-neutral-800">Inventory</h1>
-        <Button onClick={openAdd}>Add item</Button>
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center gap-3">
+            <span className="text-school-600 font-bold text-lg">{ }</span>
+            <h1 className="text-gray-900 text-xl font-semibold">Asset Inventory</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={openAdd}
+              className="px-4 py-2 bg-school-600 hover:bg-school-700 text-white rounded text-sm transition-all"
+            >
+              + Add Asset
+            </button>
+
+            <button
+              onClick={() => printDepartment(activeDept)}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm transition-all"
+            >
+              Print Department
+            </button>
+
+            <button
+              onClick={() => handleRemoveDepartment(activeDept)}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-all"
+            >
+              Remove Department
+            </button>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardTitle>Filters</CardTitle>
-        <div className="flex flex-wrap gap-4">
-          <Select
-            label="Department"
-            value={filterDept}
-            onChange={(e) => setFilterDept(e.target.value)}
-            options={[{ value: '', label: 'All' }, ...DEPARTMENTS.map((d) => ({ value: d, label: d }))]}
-            className="w-40"
-          />
-          <Select
-            label="Classification"
-            value={filterClass}
-            onChange={(e) => setFilterClass(e.target.value)}
-            options={[
-              { value: '', label: 'All' },
-              ...CLASSIFICATIONS.map((c) => ({ value: c, label: c })),
-            ]}
-            className="w-40"
-          />
-          <label className="flex items-center gap-2 pt-6">
-            <input
-              type="checkbox"
-              checked={filterDefective}
-              onChange={(e) => setFilterDefective(e.target.checked)}
-              className="rounded border-neutral-300 text-olive-600 focus:ring-olive-500"
-            />
-            <span className="text-sm text-neutral-700">Defective only</span>
-          </label>
-        </div>
-      </Card>
-
-      {error && (
-        <div className="rounded-xl bg-red-50 text-red-600 p-4 text-sm">{error}</div>
-      )}
-
-      <Card>
-        <CardTitle>Items</CardTitle>
-        {loading ? (
-          <p className="text-neutral-500">Loading...</p>
-        ) : items.length === 0 ? (
-          <p className="text-neutral-500">No items. Add one to get started.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600">
-                  <th className="pb-3 pr-4">Name</th>
-                  <th className="pb-3 pr-4">Department</th>
-                  <th className="pb-3 pr-4">Classification</th>
-                  <th className="pb-3 pr-4">Quantity</th>
-                  <th className="pb-3 pr-4">Defective</th>
-                  <th className="pb-3 pl-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr key={item.id} className="border-b border-neutral-100">
-                    <td className="py-3 pr-4 font-medium">{item.name}</td>
-                    <td className="py-3 pr-4">{item.department ?? '—'}</td>
-                    <td className="py-3 pr-4">{item.classification ?? '—'}</td>
-                    <td className="py-3 pr-4">{item.quantity}</td>
-                    <td className="py-3 pr-4">{item.is_defective ? 'Yes' : 'No'}</td>
-                    <td className="py-3 pl-4 text-right">
-                      <Button variant="ghost" className="mr-2" onClick={() => openEdit(item)}>
-                        Edit
-                      </Button>
-                      <Button variant="ghost" className="text-red-600 hover:bg-red-50" onClick={() => handleDelete(item.id)}>
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Main content */}
+      <div className="p-6 max-w-7xl mx-auto">
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-300 text-red-800 p-3 rounded text-sm">
+            <span className="text-red-600 font-semibold">Error:</span> {error}
           </div>
         )}
-      </Card>
 
-      {modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" role="dialog" aria-modal="true">
-          <div className="rounded-2xl bg-white shadow-xl max-w-md w-full p-6 animate-fade-in">
-            <h2 className="text-lg font-semibold mb-4">
-              {modal === 'add' ? 'Add item' : 'Edit item'}
-            </h2>
-            <div className="space-y-4">
-              <Input
-                label="Name"
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Item name"
-              />
-              <Input
-                label="Description"
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="Optional"
-              />
-              <Input
-                label="Quantity"
-                type="number"
-                min={0}
-                value={form.quantity}
-                onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-              />
-              <Select
-                label="Department"
-                value={form.department}
-                onChange={(e) => setForm((f) => ({ ...f, department: e.target.value }))}
-                options={[{ value: '', label: 'Select' }, ...DEPARTMENTS.map((d) => ({ value: d, label: d }))]}
-              />
-              <Select
-                label="Classification"
-                value={form.classification}
-                onChange={(e) => setForm((f) => ({ ...f, classification: e.target.value }))}
-                options={[
-                  { value: '', label: 'Select' },
-                  ...CLASSIFICATIONS.map((c) => ({ value: c, label: c })),
-                ]}
-              />
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.is_defective}
-                  onChange={(e) => setForm((f) => ({ ...f, is_defective: e.target.checked }))}
-                  className="rounded border-neutral-300 text-olive-600 focus:ring-olive-500"
-                />
-                <span className="text-sm text-neutral-700">Defective</span>
-              </label>
+        {/* Department Selector */}
+        <div className="mb-6 bg-white border border-gray-200 rounded-lg p-4 shadow-sm group">
+          <div className="text-sm text-gray-600 mb-3 font-medium">
+            Select Department
+          </div>
+          <div className="flex flex-wrap gap-2 max-h-0 overflow-hidden group-hover:max-h-96 transition-all duration-300 ease-in-out">
+            {departments.map((dept) => (
+              <button
+                key={dept}
+                onClick={() => openDeptAction(dept)}
+                className={`px-3 py-1 rounded text-xs transition-all ${
+                  activeDept === dept
+                    ? 'bg-gray-800 text-white border border-gray-800'
+                    : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                }`}
+              >
+                {dept}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900">Assets List</h2>
+          </div>
+          
+          {loading ? (
+            <div className="p-4 text-gray-500 text-sm">
+              <span className="inline-block animate-spin">⟳</span> Loading...
             </div>
-            <div className="mt-6 flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => setModal(null)}>
+          ) : items.length === 0 ? (
+            <div className="p-4 text-gray-500 text-sm">
+              No assets found
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-gray-100 border-b border-gray-200">
+                    {ASSET_COLUMNS.map((col) => (
+                      <th key={col} className="px-3 py-2 text-left text-gray-900 font-semibold border-r border-gray-200">
+                        {col}
+                      </th>
+                    ))}
+                    <th className="px-3 py-2 text-left text-gray-900 font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                                          {items.map((item) => (
+                                            <tr key={item.id} className="relative overflow-visible border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                      {ASSET_COLUMNS.map((col) => {
+                        const key = col.toLowerCase().replace(/ /g, '_')
+                        const value = item[key] ?? '—'
+                        return (
+                          <td key={key} className="px-3 py-2 text-gray-700 border-r border-gray-200">
+                            {value}
+                          </td>
+                        )
+                      })}
+                      <td className="px-3 py-2 text-center">
+                        <div className="inline-flex items-center gap-2">
+                          <button
+                            onClick={() => openEdit(item)}
+                            aria-label="Edit asset"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors font-medium"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6-6L20 8l-6 6M7 17h10" />
+                            </svg>
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            aria-label="Delete asset"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors font-medium"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          
+
+        </div>
+      </div>
+
+      {/* Department action modal */}
+      {deptAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-2xl max-w-md w-full p-5">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{deptAction}</h3>
+            <p className="text-sm text-gray-600 mb-4">Add a new asset for this department or edit an existing one</p>
+            <div className="mb-3">
+              <label className="block text-xs text-gray-700 mb-2">Existing assets</label>
+              <select
+                value={deptSelectedAssetId ?? ''}
+                onChange={(e) => setDeptSelectedAssetId(e.target.value || null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"
+              >
+                <option value="">Select asset to edit</option>
+                {deptItems.map((it) => (
+                  <option key={it.id} value={it.id}>
+                    {it.asset_user ? `${it.asset_user} (${it.id})` : it.id}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => {
+                  setActiveDept(deptAction)
+                  openAdd()
+                  setDeptAction(null)
+                }}
+                className="px-3 py-2 bg-school-600 hover:bg-school-700 text-white rounded text-sm"
+              >
+                Add Asset
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!deptSelectedAssetId) return alert('Select an asset to edit')
+                  const it = deptItems.find((i) => String(i.id) === String(deptSelectedAssetId))
+                  if (!it) return alert('Selected asset not found')
+                  setActiveDept(deptAction)
+                  openEdit(it)
+                  setDeptAction(null)
+                }}
+                disabled={!deptSelectedAssetId}
+                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm disabled:opacity-50"
+              >
+                Edit Selected
+              </button>
+            </div>
+            <div className="flex justify-end">
+              <button onClick={() => setDeptAction(null)} className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              {modal === 'add' ? 'Add New Asset' : 'Edit Asset'}
+            </h2>
+            
+            <div className="space-y-3 grid grid-cols-2 gap-3 mb-6">
+              {ASSET_COLUMNS.map((col) => {
+                const key = col.toLowerCase().replace(/ /g, '_')
+                return (
+                  <div key={col}>
+                    <label className="block text-xs text-gray-700 font-medium mb-2">
+                      {col}
+                    </label>
+                    <input
+                      type="text"
+                      value={form[key] || ''}
+                      onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                      placeholder={col}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded focus:outline-none focus:border-school-500 focus:ring-1 focus:ring-school-500"
+                    />
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="flex gap-3 justify-end pt-4">
+              <button
+                onClick={() => setModal(null)}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded text-sm transition-all"
+              >
                 Cancel
-              </Button>
-              <Button onClick={handleSave}>Save</Button>
+              </button>
+              {modal?.id && (
+                <button
+                  onClick={() => handleDelete(modal.id)}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-all"
+                >
+                  Delete
+                </button>
+              )}
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-school-600 hover:bg-school-700 text-white rounded text-sm transition-all"
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

@@ -32,15 +32,27 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- Inventory items
-create table if not exists public.inventory_items (
+-- Inventory items (Asset Tracking)
+drop table if exists public.inventory_items cascade;
+create table public.inventory_items (
   id uuid primary key default uuid_generate_v4(),
-  name text not null,
-  description text,
-  quantity int default 0,
-  department text,
-  classification text check (classification in ('transfer', 'reassignment', 'disposal')),
-  is_defective boolean default false,
+  department text not null,
+  asset_user text,
+  mouse text,
+  keyboard text,
+  mac_address text,
+  processor text,
+  motherboard text,
+  ram text,
+  hard_drive text,
+  graphic_card text,
+  operating_system text,
+  os_licenses text,
+  color_of_case text,
+  power_supply text,
+  location text,
+  dop text,
+  remarks text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -104,6 +116,9 @@ on conflict (id) do nothing;
 -- RLS: profiles (users can read own profile)
 alter table public.profiles enable row level security;
 
+drop policy if exists "Users can read own profile" on public.profiles;
+drop policy if exists "Users can update own profile" on public.profiles;
+
 create policy "Users can read own profile"
   on public.profiles for select
   using (auth.uid() = id);
@@ -114,6 +129,9 @@ create policy "Users can update own profile"
 
 -- RLS: inventory_items (ADMIN full access)
 alter table public.inventory_items enable row level security;
+
+drop policy if exists "Admin full access inventory" on public.inventory_items;
+drop policy if exists "Others read inventory" on public.inventory_items;
 
 create policy "Admin full access inventory"
   on public.inventory_items for all
@@ -134,6 +152,9 @@ create policy "Others read inventory"
 -- RLS: inventory_movements
 alter table public.inventory_movements enable row level security;
 
+drop policy if exists "Admin full access movements" on public.inventory_movements;
+drop policy if exists "Others read movements" on public.inventory_movements;
+
 create policy "Admin full access movements"
   on public.inventory_movements for all
   using (
@@ -147,6 +168,8 @@ create policy "Others read movements"
 -- RLS: deployments (ADMIN + ACCOUNTING)
 alter table public.deployments enable row level security;
 
+drop policy if exists "Admin accounting deployments" on public.deployments;
+
 create policy "Admin accounting deployments"
   on public.deployments for all
   using (
@@ -158,6 +181,10 @@ create policy "Admin accounting deployments"
 
 -- RLS: clearances
 alter table public.clearances enable row level security;
+
+drop policy if exists "Users can insert own clearances" on public.clearances;
+drop policy if exists "Admin accounting read update clearances" on public.clearances;
+drop policy if exists "Users read own clearances" on public.clearances;
 
 create policy "Users can insert own clearances"
   on public.clearances for insert
@@ -176,6 +203,8 @@ create policy "Users read own clearances"
 -- RLS: stock_requests
 alter table public.stock_requests enable row level security;
 
+drop policy if exists "Admin supplier stocks" on public.stock_requests;
+
 create policy "Admin supplier stocks"
   on public.stock_requests for all
   using (
@@ -185,6 +214,8 @@ create policy "Admin supplier stocks"
 -- RLS: supplier_invoices
 alter table public.supplier_invoices enable row level security;
 
+drop policy if exists "Supplier invoices" on public.supplier_invoices;
+
 create policy "Supplier invoices"
   on public.supplier_invoices for all
   using (
@@ -192,6 +223,10 @@ create policy "Supplier invoices"
   );
 
 -- Storage policy for documents bucket
+drop policy if exists "Authenticated read documents" on storage.objects;
+drop policy if exists "Accounting upload deployment letters" on storage.objects;
+drop policy if exists "Accounting update deployment letters" on storage.objects;
+
 create policy "Authenticated read documents"
   on storage.objects for select
   using (bucket_id = 'documents' and auth.role() = 'authenticated');

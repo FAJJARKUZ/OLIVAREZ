@@ -20,7 +20,7 @@ import { ROLES } from './config/roles'
 
 function RedirectIfAuth({ children }) {
   const { user, loading } = useAuth()
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-neutral-50">Loading...</div>
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-white">Loading...</div>
   if (user) return <Navigate to="/dashboard" replace />
   return children
 }
