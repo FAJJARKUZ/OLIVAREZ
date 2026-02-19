@@ -462,5 +462,5 @@ export function InventoryPage() {
         </div>
       )}
     </div>
-  ))
+  );
 }

@@ -32,5 +32,5 @@ body {
 
 /* Focus visible for accessibility */
 *:focus-visible {
-  @apply outline-2 outline-offset-2 outline-olive-500;
+  @apply outline-2 outline-offset-2 outline-school-500;
 }

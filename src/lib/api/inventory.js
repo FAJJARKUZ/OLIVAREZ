@@ -6,6 +6,13 @@ export async function fetchInventoryItems(filters = {}) {
     .select('*')
     .order('created_at', { ascending: false })
   if (filters.department) q = q.eq('department', filters.department)
+  if (filters.asset_user != null) {
+    if (filters.asset_user === '(Unassigned)') {
+      q = q.or('asset_user.is.null,asset_user.eq.')
+    } else {
+      q = q.eq('asset_user', filters.asset_user)
+    }
+  }
   const { data, error } = await q
   if (error) throw error
   return data ?? []

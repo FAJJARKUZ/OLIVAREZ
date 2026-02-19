@@ -1,13 +1,24 @@
 import { supabase } from '../supabase'
 
 export async function fetchMovements(limit = 100) {
-  const { data, error } = await supabase
+  const { data: movements, error: movementsError } = await supabase
     .from('inventory_movements')
-    .select('*, inventory_items(name)')
+    .select('*')
     .order('created_at', { ascending: false })
     .limit(limit)
-  if (error) throw error
-  return data ?? []
+  if (movementsError) throw movementsError
+  const items = movements ?? []
+  if (items.length === 0) return []
+  const itemIds = [...new Set(items.map((m) => m.item_id).filter(Boolean))]
+  let map = {}
+  if (itemIds.length > 0) {
+    const { data: invItems } = await supabase
+      .from('inventory_items')
+      .select('id, asset_user')
+      .in('id', itemIds)
+    map = Object.fromEntries((invItems ?? []).map((i) => [i.id, i.asset_user]))
+  }
+  return items.map((m) => ({ ...m, asset_user: map[m.item_id] ?? null }))
 }
 
 export async function createMovement(movement) {
@@ -18,4 +29,20 @@ export async function createMovement(movement) {
     .single()
   if (error) throw error
   return data
+}
+
+export async function fetchAssetUsersSummary() {
+  const { data, error } = await supabase
+    .from('inventory_items')
+    .select('id, asset_user')
+  if (error) throw error
+  const items = data ?? []
+  const byUser = {}
+  for (const item of items) {
+    const user = item.asset_user?.trim() || '(Unassigned)'
+    if (!byUser[user]) byUser[user] = { asset_user: user, quantity: 0, ids: [] }
+    byUser[user].quantity += 1
+    byUser[user].ids.push(item.id)
+  }
+  return Object.values(byUser).sort((a, b) => a.asset_user.localeCompare(b.asset_user))
 }
