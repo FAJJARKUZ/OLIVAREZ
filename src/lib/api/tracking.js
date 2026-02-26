@@ -34,14 +34,23 @@ export async function createMovement(movement) {
 export async function fetchAssetUsersSummary() {
   const { data, error } = await supabase
     .from('inventory_items')
-    .select('id, asset_user')
+    .select('id, asset_user, mouse, keyboard, mac_address, processor, motherboard, ram, hard_drive, graphic_card, operating_system, os_licenses, color_of_case, power_supply, location, dop')
   if (error) throw error
   const items = data ?? []
+  const peripheralFields = [
+    'mouse', 'keyboard', 'mac_address', 'processor', 'motherboard', 'ram',
+    'hard_drive', 'graphic_card', 'operating_system', 'os_licenses',
+    'color_of_case', 'power_supply', 'location', 'dop'
+  ]
   const byUser = {}
   for (const item of items) {
     const user = item.asset_user?.trim() || '(Unassigned)'
     if (!byUser[user]) byUser[user] = { asset_user: user, quantity: 0, ids: [] }
-    byUser[user].quantity += 1
+    const filledCount = peripheralFields.filter((field) => {
+      const value = item[field]
+      return value != null && String(value).trim() !== ''
+    }).length
+    byUser[user].quantity += filledCount
     byUser[user].ids.push(item.id)
   }
   return Object.values(byUser).sort((a, b) => a.asset_user.localeCompare(b.asset_user))

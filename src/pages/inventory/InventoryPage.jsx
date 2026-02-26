@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import * as inventoryApi from '../../lib/api/inventory'
+import { BarcodeScanner } from '../../components/BarcodeScanner'
 
 const DEPARTMENTS = [
   'FINANCE DEPARTMENT',
@@ -57,6 +58,23 @@ const ASSET_COLUMNS = [
   'REMARKS',
 ]
 
+const SCANNABLE_FIELDS = [
+  'MOUSE',
+  'KEYBOARD',
+  'MAC ADDRESS',
+  'PROCESSOR',
+  'MOTHERBOARD',
+  'RAM',
+  'HARD DRIVE',
+  'GRAPHIC CARD',
+  'OPERATING SYSTEM',
+  'OS LICENSES',
+  'COLOR OF CASE',
+  'POWER SUPPLY',
+  'LOCATION',
+  'DOP',
+]
+
 export function InventoryPage() {
   const [activeDept, setActiveDept] = useState(DEPARTMENTS[0])
   const [items, setItems] = useState([])
@@ -64,10 +82,10 @@ export function InventoryPage() {
   const [error, setError] = useState('')
   const [modal, setModal] = useState(null) // 'add' | { id } | null
   const [form, setForm] = useState({})
-  const [departments, setDepartments] = useState(DEPARTMENTS)
   const [deptAction, setDeptAction] = useState(null) // department name or null
   const [deptItems, setDeptItems] = useState([])
   const [deptSelectedAssetId, setDeptSelectedAssetId] = useState(null)
+  const [scanningField, setScanningField] = useState(null) // field key being scanned
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -106,6 +124,13 @@ export function InventoryPage() {
     setForm(editForm)
   }
 
+  function handleScan(fieldKey) {
+    return (value) => {
+      setForm((f) => ({ ...f, [fieldKey]: value }))
+      setScanningField(null)
+    }
+  }
+
   async function openDeptAction(dept) {
     setDeptAction(dept)
     try {
@@ -116,65 +141,6 @@ export function InventoryPage() {
       setDeptItems([])
       alert('Unable to load department assets: ' + e.message)
     }
-  }
-
-  async function print(dept) {
-    try {
-      const data = await inventoryApi.fetchInventoryItems({ department: dept })
-      const rows = data || []
-      const printContent = `
-      <html>
-        <head>
-          <title>${dept} - Asset Inventory</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; color: #111827; }
-            h1 { text-align: center; color: #10b981; font-weight: bold; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th { background-color: #f3f4f6; color: #065f46; padding: 8px; text-align: left; border: 1px solid #e5e7eb; }
-            td { padding: 8px; border: 1px solid #e5e7eb; color: #374151; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <h1>${dept}</h1>
-          <table>
-            <thead>
-              <tr>
-                ${ASSET_COLUMNS.map((col) => `<th>${col}</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              ${rows
-                .map(
-                  (item) =>
-                    `<tr>${ASSET_COLUMNS.map((col) => {
-                      const key = col.toLowerCase().replace(/ /g, '_')
-                      return `<td>${item[key] ?? '—'}</td>`
-                    }).join('')}</tr>`
-                )
-                .join('')}
-            </tbody>
-          </table>
-        </body>
-      </html>
-      `
-      const w = window.open('', '_blank')
-      w.document.write(printContent)
-      w.document.close()
-      w.print()
-    } catch (e) {
-      alert('Unable to print department: ' + e.message)
-    }
-  }
-
-  function handleRemoveDepartment(dept) {
-    if (!confirm(`Remove department "${dept}" from the selector? This only hides it locally.`)) return
-    setDepartments((prev) => prev.filter((d) => d !== dept))
-    if (dept === activeDept) {
-      const next = DEPARTMENTS.find((d) => d !== dept) || ''
-      setActiveDept(next)
-      // load will run via effect when activeDept changes
-    }
-    setDeptAction(null)
   }
 
   async function handleSave() {
@@ -189,12 +155,14 @@ export function InventoryPage() {
       })
 
       if (modal === 'add') {
-        await inventoryApi.createInventoryItem(payload)
+        const created = await inventoryApi.createInventoryItem(payload)
+        setModal(null)
+        setItems((prev) => [created, ...prev])
       } else if (modal?.id) {
-        await inventoryApi.updateInventoryItem(modal.id, payload)
+        const updated = await inventoryApi.updateInventoryItem(modal.id, payload)
+        setModal(null)
+        setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
       }
-      setModal(null)
-      load()
     } catch (e) {
       setError(e.message)
     }
@@ -211,8 +179,6 @@ export function InventoryPage() {
       setError(e.message)
     }
   }
-
-  // `printDepartment` is used for printing; remove unused `handlePrint`.
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -231,19 +197,6 @@ export function InventoryPage() {
               + Add Asset
             </button>
 
-            <button
-              onClick={() => printDepartment(activeDept)}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm transition-all"
-            >
-              Print Department
-            </button>
-
-            <button
-              onClick={() => handleRemoveDepartment(activeDept)}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-all"
-            >
-              Remove Department
-            </button>
           </div>
         </div>
       </div>
@@ -257,12 +210,12 @@ export function InventoryPage() {
         )}
 
         {/* Department Selector */}
-        <div className="mb-6 bg-white border border-gray-200 rounded-lg p-4 shadow-sm group">
+        <div className="mb-6 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
           <div className="text-sm text-gray-600 mb-3 font-medium">
             Select Department
           </div>
-          <div className="flex flex-wrap gap-2 max-h-0 overflow-hidden group-hover:max-h-96 transition-all duration-300 ease-in-out">
-            {departments.map((dept) => (
+          <div className="flex flex-wrap gap-2">
+            {DEPARTMENTS.map((dept) => (
               <button
                 key={dept}
                 onClick={() => openDeptAction(dept)}
@@ -419,18 +372,31 @@ export function InventoryPage() {
             <div className="space-y-3 grid grid-cols-2 gap-3 mb-6">
               {ASSET_COLUMNS.map((col) => {
                 const key = col.toLowerCase().replace(/ /g, '_')
+                const isScannable = SCANNABLE_FIELDS.includes(col)
                 return (
                   <div key={col}>
                     <label className="block text-xs text-gray-700 font-medium mb-2">
                       {col}
+                      {isScannable && (
+                        <button
+                          type="button"
+                          onClick={() => setScanningField(key)}
+                          className="ml-2 text-school-600 hover:text-school-700 text-xs font-normal"
+                          title="Scan barcode"
+                        >
+                          📷 Scan
+                        </button>
+                      )}
                     </label>
-                    <input
-                      type="text"
-                      value={form[key] || ''}
-                      onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                      placeholder={col}
-                      className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded focus:outline-none focus:border-school-500 focus:ring-1 focus:ring-school-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={form[key] || ''}
+                        onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                        placeholder={col}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded focus:outline-none focus:border-school-500 focus:ring-1 focus:ring-school-500"
+                      />
+                    </div>
                   </div>
                 )
               })}
@@ -459,6 +425,16 @@ export function InventoryPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Barcode Scanner Modal */}
+      {scanningField && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <BarcodeScanner
+            onScan={handleScan(scanningField)}
+            onClose={() => setScanningField(null)}
+          />
         </div>
       )}
     </div>

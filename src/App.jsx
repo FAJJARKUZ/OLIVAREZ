@@ -9,6 +9,7 @@ import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { InventoryPage } from './pages/inventory/InventoryPage'
 import { TrackingPage } from './pages/tracking/TrackingPage'
 import { AssetDeploymentPage } from './pages/deployment/AssetDeploymentPage'
+import { DeploymentDetailsPage } from './pages/deployment/DeploymentDetailsPage'
 import { ClearancesPage } from './pages/clearances/ClearancesPage'
 import { StocksPage } from './pages/stocks/StocksPage'
 import { ReportsPage } from './pages/reports/ReportsPage'
@@ -52,6 +53,7 @@ function App() {
             <Route path="inventory" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><InventoryPage /></ProtectedRoute>} />
             <Route path="tracking" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><TrackingPage /></ProtectedRoute>} />
             <Route path="asset-deployment" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING]}><AssetDeploymentPage /></ProtectedRoute>} />
+            <Route path="asset-deployment/:id" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING]}><DeploymentDetailsPage /></ProtectedRoute>} />
             <Route path="clearances" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING]}><ClearancesPage /></ProtectedRoute>} />
             <Route path="stocks" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPLIER]}><StocksPage /></ProtectedRoute>} />
             <Route path="reports" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING, ROLES.SUPPLIER]}><ReportsPage /></ProtectedRoute>} />

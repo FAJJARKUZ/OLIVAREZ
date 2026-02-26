@@ -53,6 +53,7 @@ create table public.inventory_items (
   location text,
   dop text,
   remarks text,
+  serial_number text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -70,6 +71,7 @@ create table if not exists public.inventory_movements (
 -- Deployments (asset deployment, serial numbers)
 create table if not exists public.deployments (
   id uuid primary key default uuid_generate_v4(),
+  inventory_item_id uuid references public.inventory_items(id) on delete set null,
   serial_number text,
   asset_name text,
   department text,

@@ -19,6 +19,17 @@ export async function createDeployment(deployment) {
   return data
 }
 
+export async function updateDeployment(id, updates) {
+  const { data, error } = await supabase
+    .from('deployments')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function uploadDeploymentLetter(id, file) {
   const path = `deployment-letters/${id}/${file.name}`
   const { error: uploadError } = await supabase.storage
@@ -30,4 +41,9 @@ export async function uploadDeploymentLetter(id, file) {
     .from('deployments')
     .update({ letter_url: urlData.publicUrl })
     .eq('id', id)
+}
+
+export async function deleteDeployment(id) {
+  const { error } = await supabase.from('deployments').delete().eq('id', id)
+  if (error) throw error
 }
