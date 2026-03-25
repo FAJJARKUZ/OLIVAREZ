@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -27,6 +28,21 @@ function RedirectIfAuth({ children }) {
 }
 
 function App() {
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
+
+  useEffect(() => {
+    const isDark = theme === 'dark'
+    document.documentElement.classList.toggle('dark', isDark)
+    if (isDark) {
+      document.body.classList.add('dark')
+    } else {
+      document.body.classList.remove('dark')
+    }
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
+
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -45,7 +61,7 @@ function App() {
           <Route
             element={
               <ProtectedRoute>
-                <DashboardLayout />
+                <DashboardLayout theme={theme} toggleTheme={toggleTheme} />
               </ProtectedRoute>
             }
           >

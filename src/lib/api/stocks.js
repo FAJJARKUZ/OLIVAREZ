@@ -13,7 +13,8 @@ export async function fetchRestockList() {
   const { data, error } = await supabase
     .from('inventory_items')
     .select('*')
-    .or('quantity.lte(5),quantity.is.null')
+    // correct filter syntax: no parentheses around values
+    .or('quantity.lte.5,quantity.is.null')
     .order('quantity', { ascending: true })
   if (error) throw error
   return data ?? []

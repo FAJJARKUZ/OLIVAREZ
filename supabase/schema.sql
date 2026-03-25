@@ -86,11 +86,15 @@ create table if not exists public.clearances (
   user_id uuid references auth.users(id) on delete set null,
   request_type text,
   description text,
+  document_url text,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   reviewed_at timestamptz,
   reviewed_notes text,
   created_at timestamptz default now()
 );
+
+-- ensure existing installations get the new column
+alter table public.clearances add column if not exists document_url text;
 
 -- Stock requests (for supplier)
 create table if not exists public.stock_requests (
@@ -245,4 +249,19 @@ create policy "Accounting update deployment letters"
   using (
     bucket_id = 'documents' and
     exists (select 1 from public.profiles where id = auth.uid() and role = 'ACCOUNTING')
+  );
+
+-- allow administrators to upload clearance documents
+create policy "Admin upload clearance docs"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'documents' and
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'ADMIN')
+  );
+
+create policy "Admin update clearance docs"
+  on storage.objects for update
+  using (
+    bucket_id = 'documents' and
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'ADMIN')
   );

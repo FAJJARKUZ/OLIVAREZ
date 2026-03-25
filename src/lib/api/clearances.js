@@ -5,7 +5,17 @@ export async function fetchClearances(filters = {}) {
     .from('clearances')
     .select('*')
     .order('created_at', { ascending: false })
-  if (filters.status) q = q.eq('status', filters.status)
+
+  if (filters.status) {
+    if (Array.isArray(filters.status)) {
+      q = q.in('status', filters.status)
+    } else {
+      q = q.eq('status', filters.status)
+    }
+  }
+
+  if (filters.target_role) q = q.eq('target_role', filters.target_role)
+
   const { data, error } = await q
   if (error) throw error
   return data ?? []
@@ -30,4 +40,17 @@ export async function updateClearanceStatus(id, status, notes = '') {
     .single()
   if (error) throw error
   return data
+}
+
+export async function uploadClearanceDocument(id, file) {
+  const path = `clearance-docs/${id}/${file.name}`
+  const { error: uploadError } = await supabase.storage
+    .from('documents')
+    .upload(path, file, { upsert: true })
+  if (uploadError) throw uploadError
+  const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path)
+  await supabase
+    .from('clearances')
+    .update({ document_url: urlData.publicUrl })
+    .eq('id', id)
 }

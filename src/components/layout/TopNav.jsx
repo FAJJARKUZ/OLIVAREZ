@@ -60,7 +60,7 @@ const icons = {
   ),
 }
 
-export function TopNav() {
+export function TopNav({ theme, toggleTheme }) {
   const { role, user, signOut } = useAuth()
   const items = getSidebarItemsForRole(role)
 
@@ -75,10 +75,16 @@ export function TopNav() {
           <h1 className="text-lg font-bold text-gray-800">Olivarez College</h1>
         </div>
         <div className="flex items-center gap-4">
-          <p className="text-xs text-gray-600">{user?.email}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-200">{user?.email}</p>
+          <button
+            onClick={toggleTheme}
+            className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded transition-colors"
+          >
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
           <button
             onClick={() => signOut()}
-            className="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded transition-colors"
           >
             Logout
           </button>

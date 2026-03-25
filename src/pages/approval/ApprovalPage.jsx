@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
 import * as clearancesApi from '../../lib/api/clearances'
 
 export function ApprovalPage() {
+  const { role } = useAuth()
   const [clearances, setClearances] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -13,7 +15,12 @@ export function ApprovalPage() {
     setLoading(true)
     setError('')
     try {
-      const data = await clearancesApi.fetchClearances({ status: 'pending' })
+      const statusFilter = ['submitted', 'for_approval']
+      const targetFilter = role === 'ACCOUNTING' ? 'ACCOUNTING' : undefined
+      const data = await clearancesApi.fetchClearances({
+        status: statusFilter,
+        target_role: targetFilter,
+      })
       setClearances(data)
     } catch (e) {
       setError(e.message)
