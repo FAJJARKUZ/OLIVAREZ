@@ -30,3 +30,20 @@ export async function updateItemAvailability(itemId, available) {
   if (error) throw error
   return data
 }
+
+export async function createStockRequest({ item_name, quantity, availability = 'pending' }) {
+  const payload = {
+    item_name,
+    quantity: quantity ?? 1,
+    availability,
+  }
+
+  const { data, error } = await supabase
+    .from('stock_requests')
+    .insert([payload])
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}

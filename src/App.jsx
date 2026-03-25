@@ -15,6 +15,8 @@ import { ClearancesPage } from './pages/clearances/ClearancesPage'
 import { StocksPage } from './pages/stocks/StocksPage'
 import { ReportsPage } from './pages/reports/ReportsPage'
 import { FinancingPage } from './pages/financing/FinancingPage'
+import { OrdersPage } from './pages/orders/OrdersPage'
+import { ShopPage } from './pages/shop/ShopPage'
 import { ApprovalPage } from './pages/approval/ApprovalPage'
 import { StatusPage } from './pages/status/StatusPage'
 import { FinancesPage } from './pages/finances/FinancesPage'
@@ -72,11 +74,13 @@ function App() {
             <Route path="asset-deployment/:id" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING]}><DeploymentDetailsPage /></ProtectedRoute>} />
             <Route path="clearances" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING]}><ClearancesPage /></ProtectedRoute>} />
             <Route path="stocks" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPLIER]}><StocksPage /></ProtectedRoute>} />
-            <Route path="reports" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING, ROLES.SUPPLIER]}><ReportsPage /></ProtectedRoute>} />
+            <Route path="reports" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING]}><ReportsPage /></ProtectedRoute>} />
             <Route path="financing" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><FinancingPage /></ProtectedRoute>} />
             <Route path="approval" element={<ProtectedRoute allowedRoles={[ROLES.ACCOUNTING]}><ApprovalPage /></ProtectedRoute>} />
             <Route path="status" element={<ProtectedRoute allowedRoles={[ROLES.ACCOUNTING]}><StatusPage /></ProtectedRoute>} />
-            <Route path="finances" element={<ProtectedRoute allowedRoles={[ROLES.SUPPLIER]}><FinancesPage /></ProtectedRoute>} />
+            <Route path="finances" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTING]}><FinancesPage /></ProtectedRoute>} />
+            <Route path="orders" element={<ProtectedRoute allowedRoles={[ROLES.SUPPLIER]}><OrdersPage /></ProtectedRoute>} />
+            <Route path="shop" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ShopPage /></ProtectedRoute>} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

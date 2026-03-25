@@ -11,11 +11,13 @@ export const SIDEBAR_ITEMS = [
   nav('deployment', 'Asset Deployment', '/asset-deployment', [ROLES.ADMIN, ROLES.ACCOUNTING]),
   nav('clearances', 'Clearances', '/clearances', [ROLES.ADMIN, ROLES.ACCOUNTING]),
   nav('stocks', 'Stocks', '/stocks', [ROLES.ADMIN, ROLES.SUPPLIER]),
-  nav('reports', 'Reports', '/reports', [ROLES.ADMIN, ROLES.ACCOUNTING, ROLES.SUPPLIER]),
+  nav('reports', 'Reports', '/reports', [ROLES.ADMIN, ROLES.ACCOUNTING]),
   nav('financing', 'Financing', '/financing', [ROLES.ADMIN]),
   nav('approval', 'Approval', '/approval', [ROLES.ACCOUNTING]),
   nav('status', 'Status', '/status', [ROLES.ACCOUNTING]),
-  nav('finances', 'Finances', '/finances', [ROLES.SUPPLIER]),
+  nav('finances', 'Finances', '/finances', [ROLES.ADMIN, ROLES.ACCOUNTING]),
+  nav('orders', 'Orders', '/orders', [ROLES.SUPPLIER]),
+  nav('shop', 'Shop', '/shop', [ROLES.ADMIN]),
 ]
 
 export function getSidebarItemsForRole(role) {

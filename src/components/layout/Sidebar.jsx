@@ -58,6 +58,17 @@ const icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
   ),
+  orders: (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h10M7 16h6M5 5h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
+    </svg>
+  ),
+  shop: (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7l2-2h16l2 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V7zM5 9v11a1 1 0 001 1h12a1 1 0 001-1V9" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6" />
+    </svg>
+  ),
 }
 
 export function Sidebar() {
